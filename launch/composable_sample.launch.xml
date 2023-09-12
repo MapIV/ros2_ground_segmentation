@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="input/topic" default="/points_raw" description="Input pointcloud"/>
+    <arg name="output/topic" default="/points_processed" description="Output pointcloud"/>
+
+    <node pkg="ros2_composable_template" exec="ros2_composable_template_node" name="my_composable_node" output="screen">
+        <remap from="input/topic" to="$(var input/topic)"/>
+        <remap name="output/topic" to="$(var output/topic)"/>
+    </node>
+</launch>
