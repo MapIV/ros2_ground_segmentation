@@ -1,10 +1,11 @@
-# composable_sample
+# ground_segmentation
 
-ROS2 Composable Sample node. Subscribes to a PointCloud2 topic and publishes a PointCloud2 Topic.
+ROS2 Composable Node for Ground Segmentation. 
+Subscribes to a PointCloud2 topic and publishes a PointCloud2 Topic.
 
 How to launch:
 ```
-ros2 launch ros2_composable_template composable_sample.launch.xml \
+ros2 launch ros2_ground_segmentation ground_segmentation.launch.xml \
     input/topic:=/lidar/pointcloud \
     output/topic:=/processed/pointcloud
 ```

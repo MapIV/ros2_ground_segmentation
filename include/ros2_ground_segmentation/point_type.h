@@ -25,24 +25,16 @@
  *
  */
 
-#ifndef CLOUD_TO_PCD_H
-#define CLOUD_TO_PCD_H
+#ifndef GROUND_SEG_NODE_POINT_TYPE_H
+#define GROUND_SEG_NODE_POINT_TYPE_H
 
-#include <memory>
-#include "rclcpp/rclcpp.hpp"
-#include <sensor_msgs/msg/point_cloud2.hpp>
-#include <pcl_conversions/pcl_conversions.h>
+struct PointXYZIR {
+  PCL_ADD_POINT4D;
+  PCL_ADD_INTENSITY;
+  uint16_t ring;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
 
-class Ros2ComposableTemplate : public rclcpp::Node
-{
-public:
-  explicit Ros2ComposableTemplate(const rclcpp::NodeOptions & options);
-
-private:
-  void CloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr input_msg);
-
-  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_sub_;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_pub_;
-};
-
-#endif //CLOUD_TO_PCD_H
+POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZIR, (float, x, x)(float, y, y)(float, z, z)(float, intensity,
+                                                                                      intensity)(uint16_t, ring, ring))
+#endif //GROUND_SEG_NODE_POINT_TYPE_H

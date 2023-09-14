@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<launch>
+    <set_parameter name="use_sim_time" value="true" />
+    <arg name="input/topic" default="/points_raw" description="Input pointcloud"/>
+    <arg name="output/topic" default="/points_processed" description="Output pointcloud"/>
+
+    <arg name="r_min" default="0.1"/>
+    <arg name="r_max" default="20.0"/>
+    <arg name="bins_num" default="100"/>
+    <arg name="segs_num" default="20"/>
+    <arg name="threads_num" default="4"/>
+    <arg name="max_slope" default="0.1"/>
+    <arg name="max_dist_to_line" default="0.5"/>
+    <arg name="long_thres" default="1.5"/>
+    <arg name="max_long_height" default="0.5"/>
+    <arg name="max_start_height" default="0.5"/>
+    <arg name="line_search_angle" default="1.0"/>
+    <arg name="max_error" default="0.02"/>
+    <arg name="sensor_height" default="0.0"/>
+    <arg name="output_frame" default="base_link"/>
+
+
+    <node
+        pkg="tf2_ros"
+        exec="static_transform_publisher"
+        name="static_tf_base_link_pandar_xt_center"
+        args="0.0 0.0 0.5 1.5714 0.01 0.005 base_link pandar_xt32_front_center"
+    />
+
+    <node pkg="ros2_ground_segmentation" exec="linefit_ground_segmentation_node" name="linefit_ground_segmentation_node" output="screen">
+        <remap from="input/topic" to="$(var input/topic)" />
+        <remap from="output/topic" to="$(var output/topic)" />
+        <param name="r_min" value="$(var r_min)"/>
+        <param name="r_max" value="$(var r_max)"/>
+        <param name="bins_num" value="$(var bins_num)"/>
+        <param name="segs_num" value="$(var segs_num)"/>
+        <param name="threads_num" value="$(var threads_num)"/>
+        <param name="max_slope" value="$(var max_slope)"/>
+        <param name="max_dist_to_line" value="$(var max_dist_to_line)"/>
+        <param name="long_thres" value="$(var long_thres)"/>
+        <param name="max_long_height" value="$(var max_long_height)"/>
+        <param name="max_start_height" value="$(var max_start_height)"/>
+        <param name="line_search_angle" value="$(var line_search_angle)"/>
+        <param name="max_error" value="$(var max_error)"/>
+        <param name="sensor_height" value="$(var sensor_height)"/>
+        <param name="output_frame" value="$(var output_frame)"/>
+    </node>
+    <node pkg="rviz2" exec="rviz2" />
+    <node pkg="rqt_gui" exec="rqt_gui" />
+
+<!--    <include file="$(find-pkg-share tunable_static_tf_broadcaster)/launch/sample.launch.xml">-->
+<!--        <arg name="child_frame" value="pandar_xt32_front_center" />-->
+<!--        <arg name="parent_frame" value="base_link" />-->
+<!--    </include>-->
+
+
+</launch>

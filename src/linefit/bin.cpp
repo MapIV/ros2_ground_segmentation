@@ -25,40 +25,34 @@
  *
  */
 
-#include "ros2_composable_template/composable_sample.hpp"
+#include <ros2_ground_segmentation/linefit/bin.h>
 
-Ros2ComposableTemplate::Ros2ComposableTemplate(const rclcpp::NodeOptions & options) : Node("composable_sample", options) {
-
-  pointcloud_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "input/topic", rclcpp::SensorDataQoS().keep_last(1),
-      std::bind(&Ros2ComposableTemplate::CloudCallback, this, std::placeholders::_1));
-
-  pointcloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("output/topic", rclcpp::SensorDataQoS());
+Bin::Bin() : min_z_(std::numeric_limits<double>::max()), has_point_(false) {
 }
 
-void Ros2ComposableTemplate::CloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr input_msg)
-{
-  if (
-    pointcloud_pub_->get_subscription_count() > 0 ||
-    pointcloud_pub_->get_intra_process_subscription_count() > 0) { //subscription guards
+Bin::Bin(const Bin &bin) : min_z_(std::numeric_limits<double>::max()), has_point_(false) {
+}
 
-    sensor_msgs::msg::PointCloud2 cloud_result;
-    RCLCPP_INFO_STREAM(get_logger(), "Point cloud received");
+void Bin::addPoint(const pcl::PointXYZ &point) {
+  const double d = std::sqrt(point.x * point.x + point.y * point.y);
+  addPoint(d, point.z);
+}
 
-    // convert ros to pcl
-    pcl::PointCloud<pcl::PointXYZ>::Ptr raw_pointcloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::fromROSMsg(*input_msg, *raw_pointcloud_ptr);
+void Bin::addPoint(const double &d, const double &z) {
+  has_point_ = true;
+  if (z < min_z_) {
+    min_z_ = z;
+    min_z_d_ = d;
+  }
+}
 
-    // do something
+Bin::MinZPoint Bin::getMinZPoint() {
+  MinZPoint point;
 
-    // convert pcl to ros
-    auto ros_pc_msg_ptr = std::make_unique<sensor_msgs::msg::PointCloud2>();
-    pcl::toROSMsg(*raw_pointcloud_ptr, *ros_pc_msg_ptr);
+  if (has_point_) {
+    point.z = min_z_;
+    point.d = min_z_d_;
   }
 
+  return point;
 }
-
-#include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(Ros2ComposableTemplate)
-
-
