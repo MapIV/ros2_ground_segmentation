@@ -25,7 +25,7 @@
  *
  */
 
-#include "ros2_ground_segmentation/line_fit_ground_segmentation.hpp"
+#include "ros2_ground_segmentation/linefit_ground_segmentation.hpp"
 
 LinefitGroundSegmentation::LinefitGroundSegmentation(const rclcpp::NodeOptions &options) : Node("ground_segmentation", options) {
 

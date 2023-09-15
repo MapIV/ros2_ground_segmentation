@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<launch>
+    <set_parameter name="use_sim_time" value="true" />
+    <arg name="input/topic" default="/points_raw" description="Input pointcloud"/>
+    <arg name="output/topic" default="/points_processed" description="Output pointcloud"/>
+
+    <arg name="sensor_height" default="0.0"/>
+    <arg name="output_frame" default="base_link"/>
+
+    <arg name="general_max_slope" default="3.0"/>
+    <arg name="local_max_slope" default="4.0"/>
+    <arg name="radial_divider_angle" default="0.1"/>
+    <arg name="concentric_divider_distance" default="0.01"/>
+    <arg name="min_height_threshold" default="0.1"/>
+    <arg name="clipping_height" default="2.0"/>
+    <arg name="pointcloud_min_z" default="-0.2"/>
+    <arg name="min_point_distance" default="0.5"/>
+    <arg name="reclass_distance_threshold" default="0.2"/>
+    <arg name="outlier_filter" default="false"/>
+
+
+    <node
+        pkg="tf2_ros"
+        exec="static_transform_publisher"
+        name="static_tf_base_link_pandar_xt_center"
+        args="0.0 0.0 0.5 1.5714 0.01 0.005 base_link pandar_xt32_front_center"
+    />
+
+    <node pkg="ros2_ground_segmentation" exec="ray_ground_segmentation_node" name="ray_ground_segmentation_node" output="screen">
+        <remap from="input/topic" to="$(var input/topic)" />
+        <remap from="output/topic" to="$(var output/topic)" />
+        <param name="sensor_height" value="$(var sensor_height)"/>
+        <param name="output_frame" value="$(var output_frame)"/>
+        <param name="general_max_slope" value="$(var general_max_slope)"/>
+        <param name="local_max_slope" value="$(var local_max_slope)"/>
+        <param name="radial_divider_angle" value="$(var radial_divider_angle)"/>
+        <param name="concentric_divider_distance" value="$(var concentric_divider_distance)"/>
+        <param name="min_height_threshold" value="$(var min_height_threshold)"/>
+        <param name="clipping_height" value="$(var clipping_height)"/>
+        <param name="pointcloud_min_z" value="$(var pointcloud_min_z)"/>
+        <param name="min_point_distance" value="$(var min_point_distance)"/>
+        <param name="reclass_distance_threshold" value="$(var reclass_distance_threshold)"/>
+        <param name="outlier_filter" value="$(var outlier_filter)"/>
+    </node>
+    <node pkg="rviz2" exec="rviz2" />
+    <node pkg="rqt_gui" exec="rqt_gui" />
+
+<!--    <include file="$(find-pkg-share tunable_static_tf_broadcaster)/launch/sample.launch.xml">-->
+<!--        <arg name="child_frame" value="pandar_xt32_front_center" />-->
+<!--        <arg name="parent_frame" value="base_link" />-->
+<!--    </include>-->
+
+
+</launch>
