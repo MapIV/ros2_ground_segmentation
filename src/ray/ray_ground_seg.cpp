@@ -50,14 +50,27 @@ void RayGroundSeg::segmentGround(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr
                    params_.min_point_distance,
                    filtered_cloud_ptr);
 
-    PointCloudXYZIRTColor organized_points;
+  //filter by intensity if enabled
+  pcl::PointCloud<pcl::PointXYZI>::Ptr intensity_filtered_cloud_ptr(new pcl::PointCloud<pcl::PointXYZI>);
+  if (params_.intensity_filter) {
+    FilterByIntensity(filtered_cloud_ptr,
+                      params_.min_intensity,
+                      params_.max_intensity_distance,
+                      intensity_filtered_cloud_ptr);
+    std::cout << "Intensity B: " << filtered_cloud_ptr->points.size() << " | A: " << intensity_filtered_cloud_ptr->points.size() << "\n";
+  }
+  else {
+    intensity_filtered_cloud_ptr = filtered_cloud_ptr;
+  }
+
+  PointCloudXYZIRTColor organized_points;
   std::vector<pcl::PointIndices> radial_division_indices;
   std::vector<pcl::PointIndices> closest_indices;
   std::vector<PointCloudXYZIRTColor> radial_ordered_clouds;
 
   radial_dividers_num_ = ceil(360 / params_.radial_divider_angle);
 
-  ConvertXYZIToRTZColor(filtered_cloud_ptr,
+  ConvertXYZIToRTZColor(intensity_filtered_cloud_ptr,
                         organized_points,
                         radial_division_indices,
                         radial_ordered_clouds);
@@ -66,7 +79,7 @@ void RayGroundSeg::segmentGround(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr
 
   ClassifyPointCloud(radial_ordered_clouds, ground_indices, no_ground_indices);
 
-  ExtractPointsIndices(filtered_cloud_ptr,
+  ExtractPointsIndices(intensity_filtered_cloud_ptr,
                        ground_indices,
                        out_ground_points,
                        out_groundless_points);
@@ -78,11 +91,10 @@ void RayGroundSeg::segmentGround(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr
     pcl::RadiusOutlierRemoval<pcl::PointXYZI> outlier_rem;
 
     outlier_rem.setInputCloud(out_groundless_points);
-    outlier_rem.setRadiusSearch(0.5);
-    outlier_rem.setMinNeighborsInRadius (1);
-    outlier_rem.filter (*no_ground_clean_cloud_ptr);
-
-    out_groundless_points = no_ground_clean_cloud_ptr;
+    outlier_rem.setRadiusSearch(params_.min_outlier_filter_radius);
+    outlier_rem.setMinNeighborsInRadius (params_.min_outlier_filter_neighbors);
+    outlier_rem.filter (*out_groundless_points);
+    std::cout << "Radius B: " << out_groundless_points->points.size()<< " | A: " << out_groundless_points->points.size()<<"\n";
   }
 }
 
@@ -143,6 +155,32 @@ void RayGroundSeg::RemovePointsUpTo(const pcl::PointCloud<pcl::PointXYZI>::Ptr i
     if (std::sqrt(in_cloud_ptr->points[i].x * in_cloud_ptr->points[i].x +
              in_cloud_ptr->points[i].y * in_cloud_ptr->points[i].y)
         < in_min_distance)
+    {
+      indices.indices.push_back(i);
+    }
+  }
+  extractor.setIndices(std::make_shared<pcl::PointIndices>(indices));
+  extractor.setNegative(true);//true removes the indices, false leaves only the indices
+  extractor.filter(*out_filtered_cloud_ptr);
+}
+
+void RayGroundSeg::FilterByIntensity(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_ptr,
+                                     int min_intensity,
+                                     double max_distance,
+                                     pcl::PointCloud<pcl::PointXYZI>::Ptr out_filtered_cloud_ptr)
+{
+  pcl::ExtractIndices <pcl::PointXYZI> extractor;
+  extractor.setInputCloud(in_cloud_ptr);
+  pcl::PointIndices indices;
+
+#pragma omp for
+  for (size_t i = 0; i < in_cloud_ptr->points.size(); i++)
+  {
+    if ( in_cloud_ptr->points[i].intensity < min_intensity
+    && std::sqrt(in_cloud_ptr->points[i].x * in_cloud_ptr->points[i].x +
+                in_cloud_ptr->points[i].y * in_cloud_ptr->points[i].y)
+      < max_distance
+    )
     {
       indices.indices.push_back(i);
     }

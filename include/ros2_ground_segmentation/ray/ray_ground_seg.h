@@ -97,6 +97,17 @@ private:
                         pcl::PointCloud<pcl::PointXYZI>::Ptr out_filtered_cloud_ptr);
 
   /*!
+ * Removes points up to a certain distance in the XY Plane
+ * @param in_cloud_ptr Input PointCloud
+ * @param in_min_distance Minimum valid distance, points closer than this will be removed.
+ * @param out_filtered_cloud_ptr Resulting PointCloud with the invalid points removed.
+ */
+  static void FilterByIntensity(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_ptr,
+                               int min_intensity,
+                               double max_distance,
+                               pcl::PointCloud<pcl::PointXYZI>::Ptr out_filtered_cloud_ptr);
+
+  /*!
  * Returns the resulting complementary PointCloud, one with the points kept and the other removed as indicated
  * in the indices
  * @param in_cloud_ptr Input PointCloud to which the extraction will be performed

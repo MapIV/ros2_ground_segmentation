@@ -33,7 +33,8 @@ struct RayGroundParams {
   : general_max_slope(3.0), local_max_slope(5.0), sensor_height(0.0),
   radial_divider_angle(0.1), concentric_divider_distance(0.01), min_height_threshold(0.05),
   clipping_height(0.2), pointcloud_min_z(-0.1), min_point_distance(0.5),
-  reclass_distance_threshold(0.2), outlier_filter(false){
+  reclass_distance_threshold(0.2), outlier_filter(false), min_outlier_filter_neighbors(5),
+  min_outlier_filter_radius(0.5), intensity_filter(false), min_intensity(4), max_intensity_distance(20.0) {
   }
   double general_max_slope;
   double local_max_slope;
@@ -46,6 +47,11 @@ struct RayGroundParams {
   double min_point_distance;
   double reclass_distance_threshold;
   bool outlier_filter;
+  int min_outlier_filter_neighbors;
+  double min_outlier_filter_radius;
+  bool intensity_filter;
+  int min_intensity;
+  double max_intensity_distance;
 };
 
 #endif //ROS2_RAYGROUND_PARAMS_H

@@ -95,6 +95,26 @@ rcl_interfaces::msg::SetParametersResult RayGroundSegmentation::ReconfigureCallb
     RCLCPP_INFO_STREAM(get_logger(), "Setting outlier_filter to: " << rayground_params_.outlier_filter);
     update = true;
   }
+  if (get_param(p, "min_outlier_filter_neighbors", rayground_params_.min_outlier_filter_neighbors)) {
+    RCLCPP_INFO_STREAM(get_logger(), "Setting min_outlier_filter_neighbors to: " << rayground_params_.min_outlier_filter_neighbors);
+    update = true;
+  }
+  if (get_param(p, "min_outlier_filter_radius", rayground_params_.min_outlier_filter_radius)) {
+    RCLCPP_INFO_STREAM(get_logger(), "Setting min_outlier_filter_radius to: " << rayground_params_.min_outlier_filter_radius);
+    update = true;
+  }
+  if (get_param(p, "intensity_filter", rayground_params_.intensity_filter)) {
+    RCLCPP_INFO_STREAM(get_logger(), "Setting intensity_filter to: " << rayground_params_.intensity_filter);
+    update = true;
+  }
+  if (get_param(p, "min_intensity", rayground_params_.min_intensity)) {
+    RCLCPP_INFO_STREAM(get_logger(), "Setting min_intensity to: " << rayground_params_.min_intensity);
+    update = true;
+  }
+  if (get_param(p, "max_intensity_distance", rayground_params_.max_intensity_distance)) {
+    RCLCPP_INFO_STREAM(get_logger(), "Setting max_intensity_distance to: " << rayground_params_.max_intensity_distance);
+    update = true;
+  }
 
   if (update) {
     rayground_ptr_->setParameters(rayground_params_);
@@ -136,6 +156,17 @@ RayGroundParams RayGroundSegmentation::GetParameters() {
 
   this->declare_parameter<bool>("outlier_filter", false, descriptor);
   rayground_params.outlier_filter = this->get_parameter("outlier_filter").as_bool();
+  this->declare_parameter<int>("min_outlier_filter_neighbors", 5, descriptor);
+  rayground_params.min_outlier_filter_neighbors = this->get_parameter("min_outlier_filter_neighbors").as_int();
+  this->declare_parameter<double>("min_outlier_filter_radius", 0.5, descriptor);
+  rayground_params.min_outlier_filter_radius = this->get_parameter("min_outlier_filter_radius").as_double();
+
+  this->declare_parameter<bool>("intensity_filter", false, descriptor);
+  rayground_params.intensity_filter = this->get_parameter("intensity_filter").as_bool();
+  this->declare_parameter<int>("min_intensity", 5, descriptor);
+  rayground_params.min_intensity = this->get_parameter("min_intensity").as_int();
+  this->declare_parameter<double>("max_intensity_distance", 20.0, descriptor);
+  rayground_params.max_intensity_distance = this->get_parameter("max_intensity_distance").as_double();
 
   this->declare_parameter<std::string>("output_frame", "base_link");
   output_frame_ = this->get_parameter("output_frame").as_string();
@@ -192,9 +223,6 @@ void RayGroundSegmentation::CloudCallback(const sensor_msgs::msg::PointCloud2::C
     rayground_ptr_->segmentGround(raw_pointcloud_ptr,
                                   no_ground_pointcloud_ptr,
                                   ground_pointcloud_ptr);
-    RCLCPP_INFO_STREAM(get_logger(), "points:" << raw_pointcloud_ptr->points.size()
-    <<" no_g: " << no_ground_pointcloud_ptr->points.size()
-    <<" gr: " << ground_pointcloud_ptr->points.size());
 
     // convert pcl to ros
     auto ros_pc_msg_ptr = std::make_unique<sensor_msgs::msg::PointCloud2>();
