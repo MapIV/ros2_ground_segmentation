@@ -87,6 +87,10 @@ rcl_interfaces::msg::SetParametersResult RayGroundSegmentation::ReconfigureCallb
     RCLCPP_INFO_STREAM(get_logger(), "Setting min_point_distance to: " << rayground_params_.min_point_distance);
     update = true;
   }
+  if (get_param(p, "max_point_distance", rayground_params_.max_point_distance)) {
+    RCLCPP_INFO_STREAM(get_logger(), "Setting max_point_distance to: " << rayground_params_.max_point_distance);
+    update = true;
+  }
   if (get_param(p, "reclass_distance_threshold", rayground_params_.reclass_distance_threshold)) {
     RCLCPP_INFO_STREAM(get_logger(), "Setting reclass_distance_threshold to: " << rayground_params_.reclass_distance_threshold);
     update = true;
@@ -151,6 +155,8 @@ RayGroundParams RayGroundSegmentation::GetParameters() {
   rayground_params.pointcloud_min_z = this->get_parameter("pointcloud_min_z").as_double();
   this->declare_parameter<double>("min_point_distance", 0.5, descriptor);
   rayground_params.min_point_distance = this->get_parameter("min_point_distance").as_double();
+  this->declare_parameter<double>("max_point_distance", 200.0, descriptor);
+  rayground_params.max_point_distance = this->get_parameter("max_point_distance").as_double();
   this->declare_parameter<double>("reclass_distance_threshold", 0.2, descriptor);
   rayground_params.reclass_distance_threshold = this->get_parameter("reclass_distance_threshold").as_double();
 
@@ -206,6 +212,8 @@ void RayGroundSegmentation::CloudCallback(const sensor_msgs::msg::PointCloud2::C
 //    pointcloud_pub_->get_subscription_count() > 0 ||
 //    pointcloud_pub_->get_intra_process_subscription_count() > 0)
   { //subscription guards
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "Received pointcloud");
 
     //transform to desired frame
     sensor_msgs::msg::PointCloud2::SharedPtr transformed_cloud_ptr(

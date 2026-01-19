@@ -46,8 +46,9 @@ void RayGroundSeg::segmentGround(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr
 
   //remove closer points than a threshold
   pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(new pcl::PointCloud<pcl::PointXYZI>);
-  RemovePointsUpTo(clipped_cloud_ptr,
+  ClipDistanceRange(clipped_cloud_ptr,
                    params_.min_point_distance,
+                   params_.max_point_distance,
                    filtered_cloud_ptr);
 
   //filter by intensity if enabled
@@ -141,8 +142,8 @@ void RayGroundSeg::ExtractPointsIndices(const pcl::PointCloud<pcl::PointXYZI>::P
   extract_ground.filter(*out_removed_indices_cloud_ptr);
 }
 
-void RayGroundSeg::RemovePointsUpTo(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_ptr,
-                                         double in_min_distance,
+void RayGroundSeg::ClipDistanceRange(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_ptr,
+                                         double in_min_distance, double in_max_distance,
                                          pcl::PointCloud<pcl::PointXYZI>::Ptr out_filtered_cloud_ptr)
 {
   pcl::ExtractIndices <pcl::PointXYZI> extractor;
@@ -152,9 +153,10 @@ void RayGroundSeg::RemovePointsUpTo(const pcl::PointCloud<pcl::PointXYZI>::Ptr i
 #pragma omp for
   for (size_t i = 0; i < in_cloud_ptr->points.size(); i++)
   {
-    if (std::sqrt(in_cloud_ptr->points[i].x * in_cloud_ptr->points[i].x +
-             in_cloud_ptr->points[i].y * in_cloud_ptr->points[i].y)
-        < in_min_distance)
+    auto distance = std::sqrt(in_cloud_ptr->points[i].x * in_cloud_ptr->points[i].x +
+                              in_cloud_ptr->points[i].y * in_cloud_ptr->points[i].y);
+
+    if (distance < in_min_distance || distance > in_max_distance)
     {
       indices.indices.push_back(i);
     }

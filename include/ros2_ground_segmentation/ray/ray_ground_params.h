@@ -32,7 +32,7 @@ struct RayGroundParams {
   RayGroundParams()
   : general_max_slope(3.0), local_max_slope(5.0), sensor_height(0.0),
   radial_divider_angle(0.1), concentric_divider_distance(0.01), min_height_threshold(0.05),
-  clipping_height(0.2), pointcloud_min_z(-0.1), min_point_distance(0.5),
+  clipping_height(0.2), pointcloud_min_z(-0.1), min_point_distance(0.5), max_point_distance(200.0),
   reclass_distance_threshold(0.2), outlier_filter(false), min_outlier_filter_neighbors(5),
   min_outlier_filter_radius(0.5), intensity_filter(false), min_intensity(4), max_intensity_distance(20.0) {
   }
@@ -45,6 +45,7 @@ struct RayGroundParams {
   double clipping_height;
   double pointcloud_min_z;
   double min_point_distance;
+  double max_point_distance;
   double reclass_distance_threshold;
   bool outlier_filter;
   int min_outlier_filter_neighbors;

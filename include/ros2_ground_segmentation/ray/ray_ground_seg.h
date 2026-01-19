@@ -92,8 +92,8 @@ private:
  * @param in_min_distance Minimum valid distance, points closer than this will be removed.
  * @param out_filtered_cloud_ptr Resulting PointCloud with the invalid points removed.
  */
-  static void RemovePointsUpTo(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_ptr,
-                        double in_min_distance,
+  static void ClipDistanceRange(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_ptr,
+                        double in_min_distance, double in_max_distance,
                         pcl::PointCloud<pcl::PointXYZI>::Ptr out_filtered_cloud_ptr);
 
   /*!
