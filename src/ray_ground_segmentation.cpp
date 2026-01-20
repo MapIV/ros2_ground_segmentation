@@ -238,6 +238,8 @@ void RayGroundSegmentation::CloudCallback(const sensor_msgs::msg::PointCloud2::C
     ros_pc_msg_ptr->header = input_msg->header;
     ros_pc_msg_ptr->header.frame_id = output_frame_;
     pointcloud_pub_->publish(std::move(ros_pc_msg_ptr));
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "Publishing pointcloud");
   }// end guards
 
 }

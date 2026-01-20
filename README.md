@@ -10,6 +10,24 @@ ros2 launch ros2_ground_segmentation ground_segmentation.launch.xml \
     output/topic:=/processed/pointcloud
 ```
 
+LidarTag:
+```
+ros2 launch ros2_ground_segmentation ray_ground_segmentation.launch.xml \
+     output_frame:=map \
+     input/topic:=/cloud_pcd  \
+     max_point_distance:=15.0  \
+     clipping_height:=1.0  \
+     sensor_height:=1.3  \
+     pointcloud_min_z:=-1.5  \
+     max_point_distance:=15.0  \
+     radial_divider_angle:=0.01  \
+     general_max_slope:=5.0  \
+     local_max_slope:=5.0  \
+     min_outlier_filter_neighbors:=50  \
+     min_outlier_filter_radius:=0.2  \
+     outlier_filter:=True
+```
+
 ## Parameters
 | Parameter       | Default         | Description              |
 |-----------------|-----------------|--------------------------|
