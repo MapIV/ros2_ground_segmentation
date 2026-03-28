@@ -9,6 +9,7 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 find_package (PCL REQUIRED COMPONENTS common io filters)
+find_package(OpenMP REQUIRED)
 
 add_definitions(${PCL_DEFINITIONS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -44,6 +45,7 @@ ament_auto_add_library(ray_ground_segmentation SHARED
 target_link_libraries(ray_ground_segmentation
         ${PCL_LIBRARIES}
         pcl_filters
+        OpenMP::OpenMP_CXX
         )
 
 target_include_directories(ray_ground_segmentation PUBLIC
